@@ -2,12 +2,12 @@ use rand::Rng;
 use std::io;
 use std::cmp::Ordering;
 
+const LIMIT_INCORRECT_GUESS: u8 = 3;
 
-
-fn are_further_trials_possible(num_of_incorrect_trials: &mut u8, limit_incor_trials: &u8) -> bool {
-    num_of_incorrect_trials = num_of_incorrect_trials + 1;
-    let remaining_trials: u8 = limit_incor_trials - num_of_incorrect_trials;
-    if num_of_incorrect_trials >= limit_incor_trials {
+fn are_further_trials_possible(num_of_incorrect_trials: u8) -> bool {
+    
+    let remaining_trials: u8 = LIMIT_INCORRECT_GUESS - num_of_incorrect_trials;
+    if num_of_incorrect_trials >= LIMIT_INCORRECT_GUESS {
         println!("THE GAME IS OVER!");
         return false;
     } else {
@@ -19,6 +19,7 @@ fn are_further_trials_possible(num_of_incorrect_trials: &mut u8, limit_incor_tri
 
 fn main() {
     println!("Guess the number!");
+    let incorrect_guess_counter: u8 = 0;
 
     
 
@@ -47,14 +48,22 @@ fn main() {
     
         match guess.cmp(&secret_number) {
             Ordering::Less => {
+                let incorrect_guess_counter = incorrect_guess_counter + 1; 
                 println!("Too small!");
-                incorrect_guess_counter = incorrect_guess_counter + 1;
-                println!("You have {} more trials", LIMIT_INCORRECT_GUESS - incorrect_guess_counter);
-                if incorrect_guess_counter == LIMIT_INCORRECT_GUESS {
-                    break;
-                };
+                let cond_to_continue: bool = are_further_trials_possible(incorrect_guess_counter);
+                if !cond_to_continue {
+                    break
+                }
+                
             },
-            Ordering::Greater => println!("Too big!"),
+            Ordering::Greater => {
+                let incorrect_guess_counter = incorrect_guess_counter + 1; 
+                println!("Too big!");
+                let cond_to_continue: bool = are_further_trials_possible(incorrect_guess_counter);
+                if !cond_to_continue {
+                    break
+                }
+            },
             Ordering::Equal => {
                 println!("You win!");
                 break;
